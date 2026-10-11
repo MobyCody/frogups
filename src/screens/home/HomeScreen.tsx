@@ -1,14 +1,27 @@
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
 import { TierBadge } from '@/components/tier-badge';
 import { TierProgressBar } from '@/components/tier-progress-bar';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { TRAINING_TIER_DETAILS } from '@/utils/onboarding';
 
+const CATCHPHRASES = [
+  'GET FROGGED!',
+  'GET RIBBIT!',
+  'TIME TO FROGOUT!',
+  "GET HOPPIN'!",
+  'BIGGEST AMPHIBIAN IN THE POND!',
+  'DO YOU EVEN LEAP?',
+  'TOADTALLY SHREDDED!',
+];
+
 export default function HomeScreen() {
   const router = useRouter();
+  const [catchphrase] = useState(
+    () => CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)],
+  );
   const { assessment, status } = useOnboarding();
 
   useEffect(() => {
@@ -42,7 +55,15 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.kicker}>FrogUps</Text>
-        <Text style={styles.title}>GET FROGGED!</Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${catchphrase} Start today's workout`}
+          onPress={() => router.push('/workout')}
+          style={({ pressed }) => [styles.startButton, pressed && styles.startButtonPressed]}
+        >
+          <Text style={styles.startButtonText}>{catchphrase}</Text>
+          <Text style={styles.startButtonSubtext}>Start today’s workout</Text>
+        </Pressable>
 
         <View style={styles.assessmentCard}>
           <Text style={styles.cardLabel}>Your starting tier</Text>
@@ -90,6 +111,28 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#1d2a1d',
     marginBottom: 24,
+  },
+  startButton: {
+    backgroundColor: '#2d7a33',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  startButtonPressed: {
+    opacity: 0.85,
+  },
+  startButtonText: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#fff',
+    textAlign: 'center',
+  },
+  startButtonSubtext: {
+    fontSize: 13,
+    color: '#d9f0d9',
+    marginTop: 4,
   },
   assessmentCard: {
     backgroundColor: '#eaf7ea',
