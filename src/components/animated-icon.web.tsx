@@ -62,11 +62,15 @@ export function AnimatedIcon() {
       </Animated.View>
 
       <Animated.View style={styles.background} entering={keyframe.duration(DURATION)}>
-        <div className={classes.expoLogoBackground} />
+        <div className={classes.frogLogoBackground} />
       </Animated.View>
 
       <Animated.View style={styles.imageContainer} entering={logoKeyframe.duration(DURATION)}>
-        <Image style={styles.image} source={require('@/assets/images/expo-logo.png')} />
+        <Image
+          style={styles.image}
+          source={require('@/assets/images/getFrogged.jpg')}
+          contentFit="contain"
+        />
       </Animated.View>
     </View>
   );
@@ -97,8 +101,9 @@ const styles = StyleSheet.create({
   },
   image: {
     position: 'absolute',
-    width: 76,
-    height: 71,
+    width: 112,
+    height: 63,
+    borderRadius: 8,
   },
   background: {
     width: 128,
