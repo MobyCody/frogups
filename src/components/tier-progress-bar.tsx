@@ -65,12 +65,12 @@ const styles = StyleSheet.create({
     right: BADGE_SIZE / 2,
     height: TRACK_HEIGHT,
     borderRadius: TRACK_HEIGHT / 2,
-    backgroundColor: '#cce6cc',
+    backgroundColor: '#cfe3fb',
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    backgroundColor: '#2d7a33',
+    backgroundColor: '#1E3A8A',
     borderRadius: TRACK_HEIGHT / 2,
   },
   badgeRow: {
@@ -82,14 +82,14 @@ const styles = StyleSheet.create({
     width: BADGE_SIZE,
     height: BADGE_SIZE,
     borderRadius: BADGE_SIZE / 2,
-    backgroundColor: '#eaf7ea',
+    backgroundColor: '#eaf2fd',
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeWrapperCurrent: {
     transform: [{ scale: 1.2 }],
     borderWidth: 2,
-    borderColor: '#2d7a33',
+    borderColor: '#1E3A8A',
   },
   badge: {
     width: BADGE_SIZE - 4,

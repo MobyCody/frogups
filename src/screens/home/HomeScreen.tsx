@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { TierBadge } from '@/components/tier-badge';
 import { TierProgressBar } from '@/components/tier-progress-bar';
 import { useOnboarding } from '@/hooks/use-onboarding';
+import { useTraining } from '@/hooks/use-training';
 import { TRAINING_TIER_DETAILS } from '@/utils/onboarding';
 
 const CATCHPHRASES = [
@@ -23,6 +24,7 @@ export default function HomeScreen() {
     () => CATCHPHRASES[Math.floor(Math.random() * CATCHPHRASES.length)],
   );
   const { assessment, status } = useOnboarding();
+  const training = useTraining();
 
   useEffect(() => {
     if (status === 'idle') {
@@ -53,24 +55,27 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.kicker}>FrogUps</Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`${catchphrase} Start today's workout`}
-          onPress={() => router.push('/workout')}
-          style={({ pressed }) => [styles.startButton, pressed && styles.startButtonPressed]}
-        >
-          <Text style={styles.startButtonText}>{catchphrase}</Text>
-          <Text style={styles.startButtonSubtext}>Start today’s workout</Text>
-        </Pressable>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Settings"
+            hitSlop={12}
+            onPress={() => router.push('/settings')}
+          >
+            <Text style={styles.cog}>⚙</Text>
+          </Pressable>
+        </View>
 
         <View style={styles.assessmentCard}>
-          <Text style={styles.cardLabel}>Your starting tier</Text>
+          <Text style={styles.cardLabel}>Your tier</Text>
           <TierBadge tier={assessment.tier} />
           <Text style={styles.tier}>{assessment.tier}</Text>
           <Text style={styles.range}>{TRAINING_TIER_DETAILS[assessment.tier].range}</Text>
           <Text style={styles.description}>{TRAINING_TIER_DETAILS[assessment.tier].description}</Text>
+          <Text style={styles.bestRecord}>
+            Best: {assessment.maxPushups} {assessment.maxPushups === 1 ? 'pushup' : 'pushups'} to failure
+          </Text>
         </View>
 
         <View style={styles.progressCard}>
@@ -78,25 +83,56 @@ export default function HomeScreen() {
           <TierProgressBar maxPushups={assessment.maxPushups} />
         </View>
 
-        <Text style={styles.description}>
-          Your assessment: {assessment.maxPushups} strict{' '}
-          {assessment.maxPushups === 1 ? 'pushup' : 'pushups'} in one set.
-        </Text>
-      </View>
+        <View style={styles.progressCard}>
+          <Text style={styles.cardLabel}>Training block</Text>
+          <Text style={styles.description}>
+            {training.nextSessionKind === 'test'
+              ? 'Block complete. Your level-up test is next.'
+              : `Workout ${training.completedInBlock + 1} of ${training.sessionsPerBlock} before your level-up test.`}
+          </Text>
+          <Text style={styles.subtle}>{training.daysPerWeek} training days per week</Text>
+        </View>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${catchphrase} Start today's workout`}
+          onPress={() => router.push('/workout')}
+          style={({ pressed }) => [styles.startButton, pressed && styles.startButtonPressed]}
+        >
+          <Text style={styles.startButtonText}>{catchphrase}</Text>
+          <Text style={styles.startButtonSubtext}>
+            {training.nextSessionKind === 'test' ? 'Start your level-up test' : 'Start today’s workout'}
+          </Text>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cog: {
+    fontSize: 26,
+    color: '#4d7c4d',
+  },
+  subtle: {
+    fontSize: 14,
+    color: '#4d7c4d',
+    marginTop: 4,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f8f2',
   },
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingVertical: 32,
+    paddingVertical: 12,
   },
   kicker: {
     fontSize: 12,
@@ -104,7 +140,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: '#4d7c4d',
     fontWeight: '700',
-    marginBottom: 12,
   },
   title: {
     fontSize: 30,
@@ -118,7 +153,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginBottom: 24,
+    marginTop: 12,
   },
   startButtonPressed: {
     opacity: 0.85,
@@ -140,7 +175,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: '#cce6cc',
-    marginBottom: 20,
+    marginBottom: 12,
+  },
+  bestRecord: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#2d7a33',
+    marginTop: 12,
   },
   progressCard: {
     backgroundColor: '#fff',

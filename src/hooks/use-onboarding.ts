@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
     getStartingTier,
@@ -26,6 +27,7 @@ export interface UseOnboardingResult {
   assessment: OnboardingAssessment | null;
   submitAssessment: () => Promise<void>;
   resetAssessment: () => Promise<void>;
+  recordMaxPushups: (value: number) => Promise<OnboardingAssessment | null>;
 }
 
 export function useOnboarding(): UseOnboardingResult {
@@ -45,34 +47,77 @@ export function useOnboarding(): UseOnboardingResult {
     return getStartingTier(parsedValue);
   }, [isValid, parsedValue]);
 
-  useEffect(() => {
-    const loadAssessment = async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+  // Reload on focus so a test result recorded on another screen shows up here
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
 
-        if (!raw) {
-          setStatus('idle');
-          return;
+      const loadAssessment = async () => {
+        try {
+          const raw = await AsyncStorage.getItem(STORAGE_KEY);
+
+          if (!active) {
+            return;
+          }
+
+          if (!raw) {
+            setAssessment(null);
+            setMaxPushupsInput('');
+            setStatus('idle');
+            return;
+          }
+
+          const saved: OnboardingAssessment = JSON.parse(raw);
+          const updated: OnboardingAssessment = {
+            ...saved,
+            tier: getStartingTier(saved.maxPushups),
+          };
+
+          setAssessment(updated);
+          setMaxPushupsInput(String(saved.maxPushups));
+          setStatus('saved');
+        } catch (loadError) {
+          console.error('Failed to load onboarding assessment:', loadError);
+          if (active) {
+            setStatus('error');
+            setError('Unable to restore your saved assessment.');
+          }
         }
+      };
 
-        const saved: OnboardingAssessment = JSON.parse(raw);
-        const updated: OnboardingAssessment = {
-          ...saved,
-          tier: getStartingTier(saved.maxPushups),
-        };
+      loadAssessment();
 
-        setAssessment(updated);
-        setMaxPushupsInput(String(saved.maxPushups));
-        setStatus('saved');
-      } catch (loadError) {
-        console.error('Failed to load onboarding assessment:', loadError);
-        setStatus('error');
-        setError('Unable to restore your saved assessment.');
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
+
+  const recordMaxPushups = useCallback(
+    async (value: number): Promise<OnboardingAssessment | null> => {
+      if (!assessment || !isValidMaxPushupInput(value)) {
+        return null;
       }
-    };
 
-    loadAssessment();
-  }, []);
+      const maxPushups = Math.max(assessment.maxPushups, value);
+      const next: OnboardingAssessment = {
+        ...assessment,
+        maxPushups,
+        tier: getStartingTier(maxPushups),
+      };
+
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+        setAssessment(next);
+        setMaxPushupsInput(String(maxPushups));
+        return next;
+      } catch (saveError) {
+        console.error('Failed to record max pushups:', saveError);
+        return null;
+      }
+    },
+    [assessment],
+  );
 
   const submitAssessment = useCallback(async () => {
     if (!isValid) {
@@ -123,5 +168,6 @@ export function useOnboarding(): UseOnboardingResult {
     assessment,
     submitAssessment,
     resetAssessment,
+    recordMaxPushups,
   };
 }
