@@ -11,8 +11,9 @@
       "icon": "./assets/images/app/icon.png"
     },
     "android": {
+      "package": "com.frogups.frogups",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#1f3d1f",
         "foregroundImage": "./assets/images/app/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false
@@ -27,8 +28,8 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/app/getFrogged.jpg",
+          "backgroundColor": "#1f3d1f",
+          "image": "./assets/images/app/splash-icon.png",
           "imageWidth": 200
         }
       ]
@@ -36,6 +37,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "9c631d3c-9d63-4d72-8005-bcdb064d1914"
+      }
+    },
+    "owner": "frogups"
   }
 }

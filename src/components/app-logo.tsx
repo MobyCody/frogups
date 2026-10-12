@@ -25,9 +25,9 @@ const styles = StyleSheet.create({
     textShadowRadius: 0,
   },
   frog: {
-    color: '#4fbf5a',
+    color: '#2D7A33',
   },
   ups: {
-    color: '#f2c94c',
+    color: '#1E3A8A',
   },
 });
