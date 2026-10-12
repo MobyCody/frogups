@@ -4,7 +4,41 @@ import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'rea
 
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useTraining } from '@/hooks/use-training';
-import { DAYS_PER_WEEK_OPTIONS } from '@/utils/workout';
+import { formatReminderTime, WEEKDAYS } from '@/utils/workout';
+
+const MINUTE_STEP = 5;
+
+function TimeStepper({
+  label,
+  value,
+  onStep,
+}: {
+  label: string;
+  value: string;
+  onStep: (delta: 1 | -1) => void;
+}) {
+  return (
+    <View style={styles.stepper}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Increase ${label}`}
+        onPress={() => onStep(1)}
+        style={styles.stepButton}
+      >
+        <Text style={styles.stepText}>▲</Text>
+      </Pressable>
+      <Text style={styles.timeValue}>{value}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Decrease ${label}`}
+        onPress={() => onStep(-1)}
+        style={styles.stepButton}
+      >
+        <Text style={styles.stepText}>▼</Text>
+      </Pressable>
+    </View>
+  );
+}
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -29,25 +63,55 @@ export default function SettingsScreen() {
         <Text style={styles.title}>Settings</Text>
 
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Training days per week</Text>
+          <Text style={styles.cardLabel}>Training days</Text>
           <View style={styles.dayRow}>
-            {DAYS_PER_WEEK_OPTIONS.map((days) => {
-              const selected = days === training.daysPerWeek;
+            {WEEKDAYS.map(({ index, short, long }) => {
+              const selected = training.trainingDays.includes(index);
 
               return (
                 <Pressable
-                  key={days}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  accessibilityLabel={`${days} days per week`}
-                  onPress={() => training.setDaysPerWeek(days)}
+                  key={index}
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: selected }}
+                  accessibilityLabel={long}
+                  onPress={() => training.toggleTrainingDay(index)}
                   style={[styles.dayPill, selected && styles.dayPillSelected]}
                 >
-                  <Text style={[styles.dayPillText, selected && styles.dayPillTextSelected]}>{days}</Text>
+                  <Text style={[styles.dayPillText, selected && styles.dayPillTextSelected]}>{short}</Text>
                 </Pressable>
               );
             })}
           </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>Reminder time</Text>
+          <View style={styles.timeRow}>
+            <TimeStepper
+              label="hour"
+              value={String(training.reminderTime.hour).padStart(2, '0')}
+              onStep={(delta) =>
+                training.setReminderTime({
+                  ...training.reminderTime,
+                  hour: (training.reminderTime.hour + delta + 24) % 24,
+                })
+              }
+            />
+            <Text style={styles.timeColon}>:</Text>
+            <TimeStepper
+              label="minute"
+              value={String(training.reminderTime.minute).padStart(2, '0')}
+              onStep={(delta) =>
+                training.setReminderTime({
+                  ...training.reminderTime,
+                  minute: (training.reminderTime.minute + delta * MINUTE_STEP + 60) % 60,
+                })
+              }
+            />
+          </View>
+          <Text style={styles.subtle}>
+            Remind me at {formatReminderTime(training.reminderTime)} on training days
+          </Text>
         </View>
 
         <View style={styles.card}>
@@ -113,7 +177,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   body: { fontSize: 16, lineHeight: 24, color: '#1d2a1d', marginBottom: 16 },
-  dayRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  dayRow: { flexDirection: 'row', gap: 4, marginTop: 8 },
   dayPill: {
     flex: 1,
     paddingVertical: 10,
@@ -124,8 +188,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dayPillSelected: { backgroundColor: '#2d7a33', borderColor: '#2d7a33' },
-  dayPillText: { fontSize: 16, fontWeight: '700', color: '#2d7a33' },
+  dayPillText: { fontSize: 13, fontWeight: '700', color: '#2d7a33' },
   dayPillTextSelected: { color: '#fff' },
+  timeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginVertical: 8 },
+  timeColon: { fontSize: 36, fontWeight: '800', color: '#1d2a1d' },
+  stepper: { alignItems: 'center', gap: 4 },
+  stepButton: {
+    width: 64,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#cce6cc',
+    alignItems: 'center',
+  },
+  stepText: { fontSize: 16, color: '#2d7a33' },
+  timeValue: { fontSize: 36, fontWeight: '800', color: '#1d2a1d' },
+  subtle: { fontSize: 14, color: '#4d7c4d', textAlign: 'center', marginTop: 4 },
   confirmRow: { flexDirection: 'row', gap: 8 },
   button: { flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
   cancelButton: { borderWidth: 1, borderColor: '#cce6cc', backgroundColor: '#fff' },

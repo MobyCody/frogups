@@ -1,5 +1,6 @@
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -11,16 +12,12 @@ import {
 } from 'react-native';
 
 import { TierBadge } from '@/components/tier-badge';
+import { AchievementUnlockModal } from '@/components/achievement-unlock-modal';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useTraining } from '@/hooks/use-training';
+import { useTrainingPlan } from '@/hooks/use-training-plan';
 import { isValidMaxPushupInput } from '@/utils/onboarding';
-import {
-  evaluateTest,
-  FIXED_SET_REPS,
-  REST_SECONDS,
-  SETS_PER_WORKOUT,
-  type SessionKind,
-} from '@/utils/workout';
+import { evaluateTest, REST_SECONDS, type SessionKind } from '@/utils/workout';
 
 type Phase = 'intro' | 'set' | 'rest' | 'finished';
 
@@ -28,7 +25,7 @@ export default function WorkoutScreen() {
   const router = useRouter();
   const { assessment, status, recordMaxPushups } = useOnboarding();
   const training = useTraining();
-
+  const plan = useTrainingPlan(assessment?.maxPushups ?? 0);
   const [phase, setPhase] = useState<Phase>('intro');
   const [kind, setKind] = useState<SessionKind>('workout');
   const [setIndex, setSetIndex] = useState(0);
@@ -37,7 +34,20 @@ export default function WorkoutScreen() {
   const [failureInput, setFailureInput] = useState('');
   const [resultMessage, setResultMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const restVisitRecorded = useRef(false);
+  const { status: trainingStatus, trainingDays, doneToday, recordRestVisit } = training;
 
+  // Visiting the rest screen on a scheduled rest day counts toward an achievement
+  useEffect(() => {
+    const isRestDay = !trainingDays.includes((new Date().getDay() + 6) % 7);
+
+    if (trainingStatus !== 'ready' || phase !== 'intro' || doneToday || !isRestDay || restVisitRecorded.current) {
+      return;
+    }
+
+    restVisitRecorded.current = true;
+    recordRestVisit();
+  }, [trainingStatus, phase, doneToday, trainingDays, recordRestVisit]);
   useEffect(() => {
     if (phase !== 'rest') {
       return;
@@ -73,10 +83,40 @@ export default function WorkoutScreen() {
     );
   }
 
-  const fixedReps = FIXED_SET_REPS[assessment.tier];
+  // Block overtraining: one session per day, and only on selected training days.
+  // Not shown after finishing, so the result screen still appears.
+  const isTrainingDay = training.trainingDays.includes((new Date().getDay() + 6) % 7);
+
+  if ((training.doneToday || !isTrainingDay) && phase === 'intro') {
+    return (
+      <View style={styles.restScreen}>
+        <Image
+          source={require('@/assets/images/illustrations/chilling-frog.jpg')}
+          contentFit="cover"
+          accessibilityLabel="A frog chilling"
+          style={styles.restImage}
+        />
+        <SafeAreaView style={styles.restBottom}>
+          <Text style={styles.title}>Time to rest</Text>
+          <Text style={styles.body}>
+            Rest is where the strength is built. Take it easy today and come back on your next training day.
+          </Text>
+          <PrimaryButton label="Back home" onPress={() => router.dismissTo('/home')} />
+        </SafeAreaView>
+        <AchievementUnlockModal
+          achievement={training.pendingAchievement}
+          onConfirm={training.acknowledgeAchievement}
+        />
+      </View>
+    );
+  }
+
+  const workoutDays = plan.filter((day) => day.sets.length > 0);
+  const todaysWorkout = workoutDays[training.completedInBlock % Math.max(workoutDays.length, 1)];
+  const plannedReps = todaysWorkout?.sets.map((set) => set.targetReps) ?? [];
   const isTest = kind === 'test';
-  const totalSets = isTest ? 1 : SETS_PER_WORKOUT;
-  const isFailureSet = isTest || setIndex === SETS_PER_WORKOUT - 1;
+  const totalSets = isTest ? 1 : plannedReps.length;
+  const isFailureSet = isTest;
   const failureReps = Number(failureInput);
   const failureInputValid = failureInput.trim().length > 0 && isValidMaxPushupInput(failureReps);
 
@@ -91,8 +131,11 @@ export default function WorkoutScreen() {
   const finishSession = async (reps: number[]) => {
     setSaving(true);
 
+    let tier = assessment.tier;
+
     if (isTest) {
       const outcome = evaluateTest(assessment.maxPushups, reps[0], assessment.tier);
+      tier = outcome.tier;
       await recordMaxPushups(reps[0]);
       setResultMessage(
         outcome.leveledUp
@@ -103,7 +146,7 @@ export default function WorkoutScreen() {
       setResultMessage(`Workout complete: ${reps.join(' + ')} pushups.`);
     }
 
-    await training.completeSession(kind, reps);
+    await training.completeSession(kind, reps, tier);
     setCompletedReps(reps);
     setSaving(false);
     setPhase('finished');
@@ -119,7 +162,12 @@ export default function WorkoutScreen() {
       return;
     }
 
-    setCompletedReps((reps) => [...reps, fixedReps]);
+    if (setIndex >= totalSets - 1) {
+      finishSession([...completedReps, plannedReps[setIndex]]);
+      return;
+    }
+
+    setCompletedReps((reps) => [...reps, plannedReps[setIndex]]);
     setSecondsLeft(REST_SECONDS);
     setPhase('rest');
   };
@@ -130,8 +178,9 @@ export default function WorkoutScreen() {
         <View style={styles.stage}>
           <TierBadge tier={assessment.tier} />
           <SetList
-            totalSets={phase === 'intro' ? (training.nextSessionKind === 'test' ? 1 : SETS_PER_WORKOUT) : totalSets}
-            fixedReps={fixedReps}
+            totalSets={phase === 'intro' ? (training.nextSessionKind === 'test' ? 1 : plannedReps.length) : totalSets}
+            plannedReps={plannedReps}
+            isTest={phase === 'intro' ? training.nextSessionKind === 'test' : isTest}
             completedReps={completedReps}
             activeIndex={phase === 'set' ? setIndex : phase === 'rest' ? setIndex + 1 : -1}
           />
@@ -146,7 +195,7 @@ export default function WorkoutScreen() {
               <Text style={styles.body}>
                 {training.nextSessionKind === 'test'
                   ? 'One set to failure. Beat the next tier’s minimum to level up.'
-                  : `${SETS_PER_WORKOUT - 1} sets of ${fixedReps} with ${REST_SECONDS}s rest, then a final set to failure.`}
+                  : `${plannedReps.join(' · ')} pushups with ${REST_SECONDS}s rest between sets.`}
               </Text>
             </View>
             <View style={styles.buttonSlot}>
@@ -164,7 +213,7 @@ export default function WorkoutScreen() {
             <Text style={styles.kicker}>
               Set {setIndex + 1} of {totalSets}
             </Text>
-            <Text style={styles.title}>{isFailureSet ? 'To failure!' : `${fixedReps} pushups`}</Text>
+            <Text style={styles.title}>{isFailureSet ? 'To failure!' : `${plannedReps[setIndex]} pushups`}</Text>
             {isFailureSet ? (
               <>
                 <Text style={styles.body}>Do as many strict pushups as you can, then enter your count.</Text>
@@ -218,6 +267,10 @@ export default function WorkoutScreen() {
               <Text style={styles.title}>Nicely done!</Text>
               <Text style={styles.body}>{resultMessage}</Text>
               <Text style={styles.total}>{completedReps.reduce((sum, reps) => sum + reps, 0)} total</Text>
+              <View style={styles.mossEarnedRow}>
+                <Image source={require('@/assets/images/illustrations/moss.png')} style={styles.mossEarnedIcon} contentFit="contain" />
+                <Text style={styles.mossEarned}>+1 moss earned!</Text>
+              </View>
             </View>
             <View style={styles.buttonSlot}>
               <PrimaryButton label="Back home" onPress={() => router.dismissTo('/home')} />
@@ -226,18 +279,24 @@ export default function WorkoutScreen() {
         )}
         </View>
       </View>
+      <AchievementUnlockModal
+        achievement={training.pendingAchievement}
+        onConfirm={training.acknowledgeAchievement}
+      />
     </SafeAreaView>
   );
 }
 
 function SetList({
   totalSets,
-  fixedReps,
+  plannedReps,
+  isTest,
   completedReps,
   activeIndex,
 }: {
   totalSets: number;
-  fixedReps: number;
+  plannedReps: number[];
+  isTest: boolean;
   completedReps: number[];
   activeIndex: number;
 }) {
@@ -246,8 +305,8 @@ function SetList({
       {Array.from({ length: totalSets }, (_, index) => {
         const isActive = index === activeIndex;
         const isDone = completedReps[index] !== undefined;
-        const isFailure = index === totalSets - 1;
-        const label = isDone ? String(completedReps[index]) : isFailure ? 'MAX' : String(fixedReps);
+        const isFailure = isTest;
+        const label = isDone ? String(completedReps[index]) : isFailure ? 'MAX' : String(plannedReps[index]);
 
         return (
           <Text
@@ -293,8 +352,31 @@ function SecondaryButton({ label, onPress }: { label: string; onPress: () => voi
 }
 
 const styles = StyleSheet.create({
+  mossEarnedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 12,
+  },
+  mossEarnedIcon: { height: 32, aspectRatio: 384 / 247 },
+  mossEarned: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#2d7a33',
+    textAlign: 'center',
+  },
   safeArea: { flex: 1, backgroundColor: '#f5f8f2' },
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 16 },
+  restScreen: { flex: 1, backgroundColor: '#f5f8f2' },
+  // Cover-fit crops the left and right edges to fill the top two thirds, edge to edge
+  restImage: { width: '100%', height: '66%' },
+  restBottom: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    justifyContent: 'center',
+  },
   kicker: {
     fontSize: 12,
     letterSpacing: 1.5,

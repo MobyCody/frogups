@@ -1,12 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
+import { AchievementUnlockModal } from '@/components/achievement-unlock-modal';
+import { SupportModal } from '@/components/support-modal';
 import { TierBadge } from '@/components/tier-badge';
 import { TierProgressBar } from '@/components/tier-progress-bar';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useTraining } from '@/hooks/use-training';
 import { TRAINING_TIER_DETAILS } from '@/utils/onboarding';
+import { MOSS_PER_FREEZE } from '@/utils/workout';
 
 const CATCHPHRASES = [
   'GET FROGGED!',
@@ -18,6 +23,17 @@ const CATCHPHRASES = [
   'TOADTALLY SHREDDED!',
 ];
 
+const MIN_SPLASH_SIZE = 28;
+const MAX_SPLASH_SIZE = 64;
+const MAX_SPLASH_STREAK = 30;
+
+// Grows linearly from 28 to 64 as the streak approaches 30 days, then stays maxed
+function getSplashSize(streak: number): number {
+  const ratio = Math.min(Math.max(streak, 0), MAX_SPLASH_STREAK) / MAX_SPLASH_STREAK;
+
+  return Math.round(MIN_SPLASH_SIZE + ratio * (MAX_SPLASH_SIZE - MIN_SPLASH_SIZE));
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const [catchphrase] = useState(
@@ -25,6 +41,8 @@ export default function HomeScreen() {
   );
   const { assessment, status } = useOnboarding();
   const training = useTraining();
+
+  const [supportVisible, setSupportVisible] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -55,24 +73,39 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.container}>
         <View style={styles.header}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Support the developer on Ko-fi"
+            hitSlop={12}
+            onPress={() => setSupportVisible(true)}
+          >
+            <Ionicons name="cafe-sharp" size={26} color="#4d7c4d" />
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Achievements"
+            hitSlop={12}
+            onPress={() => router.push('/achievements')}
+          >
+            <Ionicons name="trophy-sharp" size={26} color="#4d7c4d" />
+          </Pressable>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Settings"
             hitSlop={12}
             onPress={() => router.push('/settings')}
           >
-            <Text style={styles.cog}>⚙</Text>
+            <Ionicons name="settings-sharp" size={26} color="#4d7c4d" />
           </Pressable>
         </View>
 
         <View style={styles.assessmentCard}>
           <Text style={styles.cardLabel}>Your tier</Text>
-          <TierBadge tier={assessment.tier} />
+          <TierBadge tier={assessment.tier} height={96} />
           <Text style={styles.tier}>{assessment.tier}</Text>
           <Text style={styles.range}>{TRAINING_TIER_DETAILS[assessment.tier].range}</Text>
-          <Text style={styles.description}>{TRAINING_TIER_DETAILS[assessment.tier].description}</Text>
           <Text style={styles.bestRecord}>
             Best: {assessment.maxPushups} {assessment.maxPushups === 1 ? 'pushup' : 'pushups'} to failure
           </Text>
@@ -84,13 +117,41 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.progressCard}>
-          <Text style={styles.cardLabel}>Training block</Text>
-          <Text style={styles.description}>
-            {training.nextSessionKind === 'test'
-              ? 'Block complete. Your level-up test is next.'
-              : `Workout ${training.completedInBlock + 1} of ${training.sessionsPerBlock} before your level-up test.`}
+          <Text style={styles.cardLabel}>Sweat to stay wet!</Text>
+          <View style={styles.streakRow}>
+            <Text style={[styles.splash, { fontSize: getSplashSize(training.streak) }]}>💦</Text>
+            <Text style={styles.streak}>
+              {training.streak} {training.streak === 1 ? 'day' : 'days'}
+            </Text>
+            <View style={styles.mossInfo}>
+              <View style={styles.mossCountRow}>
+                <Image source={require('@/assets/images/illustrations/moss.png')} style={styles.mossIcon} contentFit="contain" />
+                <Text style={styles.mossCount}>{training.moss} moss</Text>
+              </View>
+              <Text style={styles.mossHint}>
+                {training.freezes > 0
+                  ? `💧 ${training.freezes} ${training.freezes === 1 ? 'freeze' : 'freezes'} banked`
+                  : `spend ${MOSS_PER_FREEZE} to moisturize`}
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Moisturize for ${MOSS_PER_FREEZE} moss`}
+                accessibilityState={{ disabled: !training.canMoisturize }}
+                disabled={!training.canMoisturize}
+                onPress={training.moisturize}
+                style={[styles.moisturizeButton, !training.canMoisturize && styles.moisturizeButtonDisabled]}
+              >
+                <Text style={styles.moisturizeText}>Moisturize</Text>
+              </Pressable>
+            </View>
+          </View>
+          <Text style={styles.subtle}>
+            {training.doneToday
+              ? 'Good job staying clean.'
+              : training.streak > 0
+                ? 'Train today to keep it going.'
+                : 'Finish a workout to get your feet wet.'}
           </Text>
-          <Text style={styles.subtle}>{training.daysPerWeek} training days per week</Text>
         </View>
 
         <Pressable
@@ -104,7 +165,12 @@ export default function HomeScreen() {
             {training.nextSessionKind === 'test' ? 'Start your level-up test' : 'Start today’s workout'}
           </Text>
         </Pressable>
-      </ScrollView>
+        <SupportModal visible={supportVisible} onClose={() => setSupportVisible(false)} />
+        <AchievementUnlockModal
+          achievement={training.pendingAchievement}
+          onConfirm={training.acknowledgeAchievement}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -114,23 +180,48 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
+    gap: 20,
     marginBottom: 12,
-  },
-  cog: {
-    fontSize: 26,
-    color: '#4d7c4d',
   },
   subtle: {
     fontSize: 14,
     color: '#4d7c4d',
     marginTop: 4,
   },
+  streakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minHeight: MAX_SPLASH_SIZE * 1.25,
+  },
+  splash: {
+    includeFontPadding: false,
+  },
+  mossInfo: { flex: 1, alignItems: 'center', marginLeft: 60 },
+  mossCountRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  mossIcon: { height: 26, aspectRatio: 384 / 247 },
+  mossCount: { fontSize: 16, fontWeight: '800', color: '#1d2a1d' },
+  mossHint: { fontSize: 12, color: '#4d7c4d', marginTop: 2, marginBottom: 6 },
+  moisturizeButton: {
+    backgroundColor: '#1E3A8A',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+  },
+  moisturizeButtonDisabled: { opacity: 0.35 },
+  moisturizeText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  streak: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#1d2a1d',
+  },
   safeArea: {
     flex: 1,
     backgroundColor: '#f5f8f2',
   },
   container: {
-    flexGrow: 1,
+    flex: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
