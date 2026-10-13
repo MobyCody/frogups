@@ -37,7 +37,7 @@ export const ACHIEVEMENTS: readonly AchievementDefinition[] = [
   {
     id: 'spawn-point',
     title: 'The Spawn Point',
-    description: 'Complete your first training block and take the recalibration test.',
+    description: 'Complete your first workout.',
     secret: false,
     image: require('@/assets/images/achievements/spawn-point.png'),
   },
@@ -161,7 +161,7 @@ function tierIndex(tier: TrainingTier | null): number {
 export function getEarnedAchievements(snapshot: AchievementSnapshot): AchievementId[] {
   const earned: AchievementId[] = [];
 
-  if (snapshot.testJustCompleted) earned.push('spawn-point');
+  if (snapshot.totalSessions >= 1) earned.push('spawn-point');
   if (tierIndex(snapshot.tier) >= TRAINING_TIERS.indexOf('Bullfrog')) earned.push('cult-of-the-bullfrog');
   if (snapshot.tier === MAX_TIER) earned.push('raid-boss');
   if (snapshot.streak >= SWAMP_PALADIN_STREAK) earned.push('swamp-paladin');

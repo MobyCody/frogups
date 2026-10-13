@@ -61,11 +61,12 @@ export interface ReminderSettings {
 }
 
 const STREAK_ALERT_HOUR = 21;
-const STREAK_ALERT_DAYS_AHEAD = 14;
+const REMINDER_DAYS_AHEAD = 14;
 
-// Replaces all scheduled reminders: a weekly reminder per training day, plus one-off 21:00 streak
-// alerts for upcoming training days. The alerts are one-off so a finished session can skip today's;
-// they are rebuilt whenever settings change, a session is saved, or the app opens.
+// Replaces all scheduled reminders with one-off notifications for the next two weeks: a reminder at
+// the chosen time on each upcoming training day, plus 21:00 streak alerts while a streak is running.
+// They are one-off so a finished session can skip today's; they are rebuilt whenever settings change,
+// a session is saved, or the app opens.
 // trainingDays use 0 = Monday … 6 = Sunday.
 export async function syncReminders(settings: ReminderSettings, askForPermission: boolean): Promise<void> {
   const { trainingDays, reminderTime: time, completedAt, frozenDays } = settings;
@@ -91,48 +92,23 @@ export async function syncReminders(settings: ReminderSettings, askForPermission
       return;
     }
 
-    await Promise.all(
-      trainingDays.map((day) =>
-        Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Time for your pushups 🐸',
-            body: 'Today is a training day. Ready to get frogged?',
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-            // expo-notifications weekdays run 1 = Sunday … 7 = Saturday
-            weekday: ((day + 1) % 7) + 1,
-            hour: time.hour,
-            minute: time.minute,
-            channelId: CHANNEL_ID,
-          },
-        }),
-      ),
-    );
-
     const now = new Date();
     const { current, doneToday } = getStreak(completedAt, trainingDays, now, frozenDays);
+    const scheduled: Promise<string>[] = [];
 
-    // Nothing to save without a streak
-    if (current === 0) {
-      return;
-    }
-
-    const alerts: Promise<string>[] = [];
-
-    for (let offset = 0; offset < STREAK_ALERT_DAYS_AHEAD; offset += 1) {
-      const fireAt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, STREAK_ALERT_HOUR);
+    for (let offset = 0; offset < REMINDER_DAYS_AHEAD; offset += 1) {
+      const fireAt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, time.hour, time.minute);
       const isTrainingDay = trainingDays.includes((fireAt.getDay() + 6) % 7);
 
       if (!isTrainingDay || fireAt <= now || (offset === 0 && doneToday)) {
         continue;
       }
 
-      alerts.push(
+      scheduled.push(
         Notifications.scheduleNotificationAsync({
           content: {
-            title: `Save your ${current}-day streak 💦`,
-            body: 'You haven’t trained yet today. A quick workout keeps your streak alive!',
+            title: 'Time for your pushups 🐸',
+            body: 'Today is a training day. Ready to get frogged?',
           },
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -143,7 +119,33 @@ export async function syncReminders(settings: ReminderSettings, askForPermission
       );
     }
 
-    await Promise.all(alerts);
+    // Nothing to save without a streak
+    if (current > 0) {
+      for (let offset = 0; offset < REMINDER_DAYS_AHEAD; offset += 1) {
+        const fireAt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, STREAK_ALERT_HOUR);
+        const isTrainingDay = trainingDays.includes((fireAt.getDay() + 6) % 7);
+
+        if (!isTrainingDay || fireAt <= now || (offset === 0 && doneToday)) {
+          continue;
+        }
+
+        scheduled.push(
+          Notifications.scheduleNotificationAsync({
+            content: {
+              title: `Save your ${current}-day streak 💦`,
+              body: 'You haven’t trained yet today. A quick workout keeps your streak alive!',
+            },
+            trigger: {
+              type: Notifications.SchedulableTriggerInputTypes.DATE,
+              date: fireAt,
+              channelId: CHANNEL_ID,
+            },
+          }),
+        );
+      }
+    }
+
+    await Promise.all(scheduled);
   } catch (error) {
     console.error('Failed to sync reminders:', error);
   }

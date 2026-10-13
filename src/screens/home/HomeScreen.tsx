@@ -120,10 +120,26 @@ export default function HomeScreen() {
         <View style={styles.progressCard}>
           <Text style={styles.cardLabel}>Sweat to stay wet!</Text>
           <View style={styles.streakRow}>
-            <Text style={[styles.splash, { fontSize: getSplashSize(training.streak) }]}>💦</Text>
-            <Text style={styles.streak}>
-              {training.streak} {training.streak === 1 ? 'day' : 'days'}
-            </Text>
+            <View style={styles.splashSlot}>
+              <Text style={[styles.splash, { fontSize: getSplashSize(training.streak) }]}>💦</Text>
+            </View>
+            <View style={styles.streakInfo}>
+              <Text style={styles.streak}>
+                {training.streak} {training.streak === 1 ? 'day' : 'days'}
+              </Text>
+              <Text style={styles.subtle}>
+                {training.doneToday
+                  ? 'Good job staying clean.'
+                  : training.streak > 0
+                    ? 'Train today to keep it going.'
+                    : 'Finish a workout to get your feet wet.'}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.mossRow}>
             <View style={styles.mossInfo}>
               <View style={styles.mossCountRow}>
                 <Image source={require('@/assets/images/illustrations/moss.png')} style={styles.mossIcon} contentFit="contain" />
@@ -132,27 +148,20 @@ export default function HomeScreen() {
               <Text style={styles.mossHint}>
                 {training.freezes > 0
                   ? `💧 ${training.freezes} ${training.freezes === 1 ? 'freeze' : 'freezes'} banked`
-                  : `spend ${MOSS_PER_FREEZE} to moisturize`}
+                  : `Spend ${MOSS_PER_FREEZE} to moisturize`}
               </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Moisturize for ${MOSS_PER_FREEZE} moss`}
-                accessibilityState={{ disabled: !training.canMoisturize }}
-                disabled={!training.canMoisturize}
-                onPress={training.moisturize}
-                style={[styles.moisturizeButton, !training.canMoisturize && styles.moisturizeButtonDisabled]}
-              >
-                <Text style={styles.moisturizeText}>Moisturize</Text>
-              </Pressable>
             </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Moisturize for ${MOSS_PER_FREEZE} moss`}
+              accessibilityState={{ disabled: !training.canMoisturize }}
+              disabled={!training.canMoisturize}
+              onPress={training.moisturize}
+              style={[styles.moisturizeButton, !training.canMoisturize && styles.moisturizeButtonDisabled]}
+            >
+              <Text style={styles.moisturizeText}>Moisturize</Text>
+            </Pressable>
           </View>
-          <Text style={styles.subtle}>
-            {training.doneToday
-              ? 'Good job staying clean.'
-              : training.streak > 0
-                ? 'Train today to keep it going.'
-                : 'Finish a workout to get your feet wet.'}
-          </Text>
         </View>
 
         <Pressable
@@ -187,22 +196,40 @@ const styles = StyleSheet.create({
   subtle: {
     fontSize: 14,
     color: '#4d7c4d',
-    marginTop: 4,
+    marginTop: 2,
   },
   streakRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    minHeight: MAX_SPLASH_SIZE * 1.25,
+    gap: 12,
   },
+  // Fixed-size slot so the text doesn't shift as the splash grows with the streak
+  splashSlot: {
+    width: MAX_SPLASH_SIZE * 1.1,
+    height: MAX_SPLASH_SIZE * 1.25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  streakInfo: { flex: 1 },
   splash: {
     includeFontPadding: false,
   },
-  mossInfo: { flex: 1, alignItems: 'center', marginLeft: 60 },
+  divider: {
+    height: 1,
+    backgroundColor: '#e1eedf',
+    marginVertical: 12,
+  },
+  mossRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  mossInfo: { flex: 1 },
   mossCountRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   mossIcon: { height: 26, aspectRatio: 384 / 247 },
   mossCount: { fontSize: 16, fontWeight: '800', color: '#1d2a1d' },
-  mossHint: { fontSize: 12, color: '#4d7c4d', marginTop: 2, marginBottom: 6 },
+  mossHint: { fontSize: 12, color: '#4d7c4d', marginTop: 4 },
   moisturizeButton: {
     backgroundColor: '#1E3A8A',
     borderRadius: 12,
@@ -242,10 +269,9 @@ const styles = StyleSheet.create({
   startButton: {
     backgroundColor: '#2d7a33',
     borderRadius: 16,
-    paddingVertical: 18,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     alignItems: 'center',
-    marginTop: 12,
   },
   startButtonPressed: {
     opacity: 0.85,
