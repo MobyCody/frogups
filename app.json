@@ -2,7 +2,7 @@
   "expo": {
     "name": "frogups",
     "slug": "frogups",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/app/icon.png",
     "scheme": "frogups",
@@ -12,6 +12,7 @@
     },
     "android": {
       "package": "com.frogups.frogups",
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#1f3d1f",
         "foregroundImage": "./assets/images/app/android-icon-foreground.png"
