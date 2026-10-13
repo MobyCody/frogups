@@ -12,9 +12,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AchievementBadge } from '@/components/achievement-badge';
+import { ShareAchievementButton } from '@/components/share-achievement-button';
 import { useTraining } from '@/hooks/use-training';
 import { ACHIEVEMENTS, type AchievementDefinition } from '@/utils/achievements';
-import { shareAchievement } from '@/utils/share-achievement';
 
 export default function AchievementsScreen() {
   const router = useRouter();
@@ -30,8 +30,6 @@ export default function AchievementsScreen() {
   }
 
   const unlockedCount = ACHIEVEMENTS.filter((achievement) => training.unlocked[achievement.id]).length;
-
-  const share = shareAchievement;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -90,9 +88,12 @@ export default function AchievementsScreen() {
                   Unlocked {new Date(training.unlocked[selected.id]).toLocaleDateString()}
                 </Text>
               )}
-              <Pressable accessibilityRole="button" onPress={() => share(selected)} style={styles.shareButton}>
-                <Text style={styles.shareText}>Share</Text>
-              </Pressable>
+              <ShareAchievementButton
+                achievement={selected}
+                unlockedAt={training.unlocked[selected.id]}
+                style={styles.shareButton}
+                textStyle={styles.shareText}
+              />
               <Pressable accessibilityRole="button" onPress={() => setSelected(null)} style={styles.closeButton}>
                 <Text style={styles.closeText}>Close</Text>
               </Pressable>

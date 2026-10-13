@@ -7,7 +7,7 @@ import {
     View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 
 import { TierBadge } from '@/components/tier-badge';
@@ -26,11 +26,26 @@ export default function OnboardingScreen() {
     submitAssessment,
   } = useOnboarding();
 
+  const submitted = useRef(false);
+
+  // A saved assessment on launch goes straight home; a fresh one continues to schedule setup
   useEffect(() => {
-    if (status === 'saved') {
-      router.replace('/home');
+    if (status !== 'saved') {
+      return;
+    }
+
+    router.replace('/home');
+
+    if (submitted.current) {
+      submitted.current = false;
+      router.push('/settings');
     }
   }, [router, status]);
+
+  const handleSubmit = () => {
+    submitted.current = true;
+    submitAssessment();
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -64,7 +79,7 @@ export default function OnboardingScreen() {
         ) : null}
 
         <Pressable
-          onPress={submitAssessment}
+          onPress={handleSubmit}
           disabled={!isValid || status === 'loading'}
           style={[styles.button, (!isValid || status === 'loading') && styles.buttonDisabled]}
         >

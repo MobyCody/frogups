@@ -1,8 +1,8 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { AchievementBadge } from '@/components/achievement-badge';
+import { ShareAchievementButton } from '@/components/share-achievement-button';
 import type { AchievementDefinition } from '@/utils/achievements';
-import { shareAchievement } from '@/utils/share-achievement';
 
 export function AchievementUnlockModal({
   achievement,
@@ -20,9 +20,11 @@ export function AchievementUnlockModal({
             <AchievementBadge image={achievement.image} locked={false} size={180} />
             <Text style={styles.title}>{achievement.title}</Text>
             <Text style={styles.body}>{achievement.description}</Text>
-            <Pressable accessibilityRole="button" onPress={() => shareAchievement(achievement)} style={styles.shareButton}>
-              <Text style={styles.shareText}>Share</Text>
-            </Pressable>
+            <ShareAchievementButton
+              achievement={achievement}
+              style={styles.shareButton}
+              textStyle={styles.shareText}
+            />
             <Pressable accessibilityRole="button" onPress={() => onConfirm(achievement.id)} style={styles.okButton}>
               <Text style={styles.okText}>Awesome!</Text>
             </Pressable>

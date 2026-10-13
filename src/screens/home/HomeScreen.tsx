@@ -6,10 +6,12 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AchievementUnlockModal } from '@/components/achievement-unlock-modal';
+import { ShareModal } from '@/components/share-modal';
 import { SupportModal } from '@/components/support-modal';
 import { TierBadge } from '@/components/tier-badge';
 import { TierProgressBar } from '@/components/tier-progress-bar';
 import { useOnboarding } from '@/hooks/use-onboarding';
+import { useSharePrompt } from '@/hooks/use-share-prompt';
 import { useTraining } from '@/hooks/use-training';
 import { TRAINING_TIER_DETAILS } from '@/utils/onboarding';
 import { MOSS_PER_FREEZE } from '@/utils/workout';
@@ -44,6 +46,11 @@ export default function HomeScreen() {
   const training = useTraining();
 
   const [supportVisible, setSupportVisible] = useState(false);
+  const sharePrompt = useSharePrompt(
+    training.history.length,
+    training.status === 'ready',
+    supportVisible || training.pendingAchievement !== null,
+  );
 
   useEffect(() => {
     if (status === 'idle') {
@@ -176,6 +183,11 @@ export default function HomeScreen() {
           </Text>
         </Pressable>
         <SupportModal visible={supportVisible} onClose={() => setSupportVisible(false)} />
+        <ShareModal
+          visible={sharePrompt.visible}
+          onClose={sharePrompt.dismiss}
+          onOptOut={sharePrompt.optOut}
+        />
         <AchievementUnlockModal
           achievement={training.pendingAchievement}
           onConfirm={training.acknowledgeAchievement}
