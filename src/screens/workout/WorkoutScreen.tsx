@@ -1,15 +1,16 @@
 import { Image } from 'expo-image';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { TierBadge } from '@/components/tier-badge';
 import { AchievementUnlockModal } from '@/components/achievement-unlock-modal';
@@ -48,6 +49,24 @@ export default function WorkoutScreen() {
     restVisitRecorded.current = true;
     recordRestVisit();
   }, [trainingStatus, phase, doneToday, trainingDays, recordRestVisit]);
+  // Keep the screen on while a session is in progress
+  const sessionActive = phase === 'set' || phase === 'rest';
+
+  useEffect(() => {
+    if (!sessionActive) {
+      return;
+    }
+
+    const tag = 'workout-session';
+    activateKeepAwakeAsync(tag).catch((keepAwakeError) =>
+      console.error('Failed to keep screen awake:', keepAwakeError),
+    );
+
+    return () => {
+      deactivateKeepAwake(tag).catch(() => {});
+    };
+  }, [sessionActive]);
+
   useEffect(() => {
     if (phase !== 'rest') {
       return;
