@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { KOFI_ENABLED, KOFI_URL } from '@/utils/support';
+import { colors } from '@/constants/colors';
 
 export function SupportModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const openKofi = () => {
@@ -41,24 +42,24 @@ export function SupportModal({ visible, onClose }: { visible: boolean; onClose: 
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
-  card: { width: '100%', backgroundColor: '#fff', borderRadius: 20, padding: 20, alignItems: 'center' },
+  card: { width: '100%', backgroundColor: colors.white, borderRadius: 20, padding: 20, alignItems: 'center' },
   image: { width: '100%', aspectRatio: 480 / 444 },
-  body: { marginTop: 16, fontSize: 16, color: '#4d7c4d', textAlign: 'center' },
-  soon: { marginTop: 16, fontSize: 14, color: '#8a9a8a', textAlign: 'center' },
+  body: { marginTop: 16, fontSize: 16, color: colors.textMuted, textAlign: 'center' },
+  soon: { marginTop: 16, fontSize: 14, color: colors.textSubtle, textAlign: 'center' },
   primaryButton: {
     marginTop: 16,
     alignSelf: 'stretch',
     alignItems: 'center',
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 14,
   },
-  primaryText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  primaryText: { color: colors.white, fontSize: 16, fontWeight: '800' },
   closeButton: { marginTop: 8, padding: 10 },
-  closeText: { fontSize: 15, fontWeight: '700', color: '#2d7a33' },
+  closeText: { fontSize: 15, fontWeight: '700', color: colors.primary },
 });

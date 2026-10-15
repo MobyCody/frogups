@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { View } from 'react-native';
 
 import { AppLogo } from '@/components/app-logo';
+import { colors } from '@/constants/colors';
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({ Silkscreen_700Bold });
@@ -27,7 +28,7 @@ export default function RootLayout() {
             headerTitleAlign: 'center',
             headerBackVisible: false,
             headerShadowVisible: false,
-            headerStyle: { backgroundColor: '#f5f8f2' },
+            headerStyle: { backgroundColor: colors.screenBackground },
           }}
         />
       )}

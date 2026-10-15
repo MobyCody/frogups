@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '@/constants/colors';
 
 interface AchievementBadgeProps {
   image: number;
@@ -32,9 +33,9 @@ const styles = StyleSheet.create({
   hidden: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#eceeea',
+    backgroundColor: colors.surfaceTint,
     borderWidth: 3,
-    borderColor: '#c4cbc4',
+    borderColor: colors.borderNeutral,
   },
-  question: { color: '#8a9a8a', fontWeight: '800' },
+  question: { color: colors.textSubtle, fontWeight: '800' },
 });

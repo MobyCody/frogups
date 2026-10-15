@@ -1,4 +1,4 @@
-﻿import { useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -15,6 +15,7 @@ import { AchievementBadge } from '@/components/achievement-badge';
 import { ShareAchievementButton } from '@/components/share-achievement-button';
 import { useTraining } from '@/hooks/use-training';
 import { ACHIEVEMENTS, type AchievementDefinition } from '@/utils/achievements';
+import { colors } from '@/constants/colors';
 
 export default function AchievementsScreen() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export default function AchievementsScreen() {
   if (training.status === 'loading') {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator accessibilityLabel="Loading achievements" color="#2d7a33" />
+        <ActivityIndicator accessibilityLabel="Loading achievements" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -106,60 +107,60 @@ export default function AchievementsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f5f8f2' },
+  safeArea: { flex: 1, backgroundColor: colors.screenBackground },
   container: { paddingHorizontal: 20, paddingVertical: 12 },
-  title: { fontSize: 28, fontWeight: '800', color: '#1d2a1d' },
-  subtle: { fontSize: 14, color: '#4d7c4d', marginTop: 4, marginBottom: 16 },
+  title: { fontSize: 28, fontWeight: '800', color: colors.textPrimary },
+  subtle: { fontSize: 14, color: colors.textMuted, marginTop: 4, marginBottom: 16 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   tile: {
     width: '47%',
     flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#cce6cc',
+    borderColor: colors.border,
     padding: 14,
   },
-  tileTitle: { marginTop: 8, fontSize: 15, fontWeight: '800', color: '#1d2a1d', textAlign: 'center' },
-  tileHint: { marginTop: 4, fontSize: 12, color: '#4d7c4d', textAlign: 'center' },
-  locked: { color: '#8a9a8a' },
+  tileTitle: { marginTop: 8, fontSize: 15, fontWeight: '800', color: colors.textPrimary, textAlign: 'center' },
+  tileHint: { marginTop: 4, fontSize: 12, color: colors.textMuted, textAlign: 'center' },
+  locked: { color: colors.textSubtle },
   badge: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#eaf7ea',
+    backgroundColor: colors.surfaceTint,
     borderWidth: 3,
-    borderColor: '#2d7a33',
+    borderColor: colors.primary,
   },
-  badgeLocked: { backgroundColor: '#eceeea', borderColor: '#c4cbc4' },
+  badgeLocked: { backgroundColor: colors.surfaceTint, borderColor: colors.borderNeutral },
   backButton: { marginTop: 20, alignItems: 'center', padding: 12 },
-  backText: { fontSize: 16, fontWeight: '700', color: '#2d7a33' },
+  backText: { fontSize: 16, fontWeight: '700', color: colors.primary },
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
   card: {
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
   },
-  cardTitle: { marginTop: 16, fontSize: 24, fontWeight: '800', color: '#1d2a1d', textAlign: 'center' },
-  cardBody: { marginTop: 8, fontSize: 16, color: '#4d7c4d', textAlign: 'center' },
-  cardDate: { marginTop: 8, fontSize: 13, color: '#8a9a8a' },
+  cardTitle: { marginTop: 16, fontSize: 24, fontWeight: '800', color: colors.textPrimary, textAlign: 'center' },
+  cardBody: { marginTop: 8, fontSize: 16, color: colors.textMuted, textAlign: 'center' },
+  cardDate: { marginTop: 8, fontSize: 13, color: colors.textSubtle },
   shareButton: {
     marginTop: 20,
     alignSelf: 'stretch',
     alignItems: 'center',
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 14,
   },
-  shareText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  shareText: { color: colors.white, fontSize: 16, fontWeight: '800' },
   closeButton: { marginTop: 8, padding: 10 },
-  closeText: { fontSize: 15, fontWeight: '700', color: '#2d7a33' },
+  closeText: { fontSize: 15, fontWeight: '700', color: colors.primary },
 });

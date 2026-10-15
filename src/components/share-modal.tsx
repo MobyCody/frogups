@@ -1,6 +1,7 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { shareApp } from '@/utils/share-app';
+import { colors } from '@/constants/colors';
 
 interface ShareModalProps {
   visible: boolean;
@@ -41,26 +42,26 @@ export function ShareModal({ visible, onClose, onOptOut }: ShareModalProps) {
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
-  card: { width: '100%', backgroundColor: '#fff', borderRadius: 20, padding: 24, alignItems: 'center' },
+  card: { width: '100%', backgroundColor: colors.white, borderRadius: 20, padding: 24, alignItems: 'center' },
   emoji: { fontSize: 40 },
-  title: { marginTop: 12, fontSize: 22, fontWeight: '800', color: '#1d2a1d', textAlign: 'center' },
-  body: { marginTop: 8, fontSize: 16, color: '#4d7c4d', textAlign: 'center' },
+  title: { marginTop: 12, fontSize: 22, fontWeight: '800', color: colors.textPrimary, textAlign: 'center' },
+  body: { marginTop: 8, fontSize: 16, color: colors.textMuted, textAlign: 'center' },
   primaryButton: {
     marginTop: 20,
     alignSelf: 'stretch',
     alignItems: 'center',
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 14,
   },
-  primaryText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  primaryText: { color: colors.white, fontSize: 16, fontWeight: '800' },
   secondaryButton: { marginTop: 8, padding: 10 },
-  secondaryText: { fontSize: 15, fontWeight: '700', color: '#2d7a33' },
+  secondaryText: { fontSize: 15, fontWeight: '700', color: colors.primary },
   optOutButton: { padding: 8 },
-  optOutText: { fontSize: 13, color: '#8a9a8a' },
+  optOutText: { fontSize: 13, color: colors.textSubtle },
 });

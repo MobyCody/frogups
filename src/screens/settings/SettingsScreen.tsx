@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useTraining } from '@/hooks/use-training';
 import { formatReminderTime, WEEKDAYS } from '@/utils/workout';
+import { colors } from '@/constants/colors';
 
 const MINUTE_STEP = 5;
 
@@ -159,59 +160,59 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f5f8f2' },
+  safeArea: { flex: 1, backgroundColor: colors.screenBackground },
   container: { flexGrow: 1, paddingHorizontal: 20, paddingVertical: 32 },
-  title: { fontSize: 30, fontWeight: '800', color: '#1d2a1d', marginBottom: 20 },
+  title: { fontSize: 30, fontWeight: '800', color: colors.textPrimary, marginBottom: 20 },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#cce6cc',
+    borderColor: colors.border,
     marginBottom: 12,
   },
   cardLabel: {
     fontSize: 12,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     letterSpacing: 1,
     marginBottom: 6,
   },
-  body: { fontSize: 16, lineHeight: 24, color: '#1d2a1d', marginBottom: 16 },
+  body: { fontSize: 16, lineHeight: 24, color: colors.textPrimary, marginBottom: 16 },
   dayRow: { flexDirection: 'row', gap: 4, marginTop: 8 },
   dayPill: {
     flex: 1,
     paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#cce6cc',
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    backgroundColor: colors.white,
     alignItems: 'center',
   },
-  dayPillSelected: { backgroundColor: '#2d7a33', borderColor: '#2d7a33' },
-  dayPillText: { fontSize: 13, fontWeight: '700', color: '#2d7a33' },
-  dayPillTextSelected: { color: '#fff' },
+  dayPillSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  dayPillText: { fontSize: 13, fontWeight: '700', color: colors.primary },
+  dayPillTextSelected: { color: colors.white },
   timeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, marginVertical: 8 },
-  timeColon: { fontSize: 36, fontWeight: '800', color: '#1d2a1d' },
+  timeColon: { fontSize: 36, fontWeight: '800', color: colors.textPrimary },
   stepper: { alignItems: 'center', gap: 4 },
   stepButton: {
     width: 64,
     paddingVertical: 8,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#cce6cc',
+    borderColor: colors.border,
     alignItems: 'center',
   },
-  stepText: { fontSize: 16, color: '#2d7a33' },
-  timeValue: { fontSize: 36, fontWeight: '800', color: '#1d2a1d' },
-  subtle: { fontSize: 14, color: '#4d7c4d', textAlign: 'center', marginTop: 4 },
+  stepText: { fontSize: 16, color: colors.primary },
+  timeValue: { fontSize: 36, fontWeight: '800', color: colors.textPrimary },
+  subtle: { fontSize: 14, color: colors.textMuted, textAlign: 'center', marginTop: 4 },
   confirmRow: { flexDirection: 'row', gap: 8 },
   button: { flex: 1, borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  cancelButton: { borderWidth: 1, borderColor: '#cce6cc', backgroundColor: '#fff' },
-  cancelText: { color: '#1d2a1d', fontSize: 16, fontWeight: '700' },
-  dangerButton: { backgroundColor: '#b3261e' },
-  dangerText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  cancelButton: { borderWidth: 1, borderColor: colors.border, backgroundColor: colors.white },
+  cancelText: { color: colors.textPrimary, fontSize: 16, fontWeight: '700' },
+  dangerButton: { backgroundColor: colors.danger },
+  dangerText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   disabled: { opacity: 0.5 },
   backButton: { paddingVertical: 14, alignItems: 'center', marginTop: 8 },
-  backText: { color: '#2d7a33', fontSize: 16, fontWeight: '700' },
+  backText: { color: colors.primary, fontSize: 16, fontWeight: '700' },
 });

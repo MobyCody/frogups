@@ -12,8 +12,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { TierBadge } from '@/components/tier-badge';
 import { AchievementUnlockModal } from '@/components/achievement-unlock-modal';
+import { TierBadge } from '@/components/tier-badge';
+import { colors } from '@/constants/colors';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useTraining } from '@/hooks/use-training';
 import { useTrainingPlan } from '@/hooks/use-training-plan';
@@ -86,7 +87,7 @@ export default function WorkoutScreen() {
   if (status === 'loading' || training.status === 'loading') {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator accessibilityLabel="Loading your workout" color="#2d7a33" />
+        <ActivityIndicator accessibilityLabel="Loading your workout" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -161,8 +162,6 @@ export default function WorkoutScreen() {
           ? `Level up! You are now a ${outcome.tier} with a max of ${outcome.maxPushups}.`
           : `${reps[0]} pushups. Keep training to reach the next tier.`,
       );
-    } else {
-      setResultMessage(`Workout complete: ${reps.join(' + ')} pushups.`);
     }
 
     await training.completeSession(kind, reps, tier);
@@ -214,7 +213,7 @@ export default function WorkoutScreen() {
               <Text style={styles.body}>
                 {training.nextSessionKind === 'test'
                   ? 'One set to failure. Beat the next tier’s minimum to level up.'
-                  : `${plannedReps.join(' · ')} pushups with ${REST_SECONDS}s rest between sets.`}
+                  : `${plannedReps.reduce((a, b) => a + b, 0)} pushups in ${plannedReps.length} sets with ${REST_SECONDS}s rest in between.`}
               </Text>
             </View>
             <View style={styles.buttonSlot}>
@@ -285,7 +284,7 @@ export default function WorkoutScreen() {
             <View style={styles.stageContent}>
               <Text style={styles.title}>Nicely done!</Text>
               <Text style={styles.body}>{resultMessage}</Text>
-              <Text style={styles.total}>{completedReps.reduce((sum, reps) => sum + reps, 0)} total</Text>
+              <Text style={styles.total}>{completedReps.reduce((sum, reps) => sum + reps, 0)} total pushups</Text>
               <View style={styles.mossEarnedRow}>
                 <Image source={require('@/assets/images/illustrations/moss.png')} style={styles.mossEarnedIcon} contentFit="contain" />
                 <Text style={styles.mossEarned}>+1 moss earned!</Text>
@@ -382,12 +381,12 @@ const styles = StyleSheet.create({
   mossEarned: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#2d7a33',
+    color: colors.primary,
     textAlign: 'center',
   },
-  safeArea: { flex: 1, backgroundColor: '#f5f8f2' },
+  safeArea: { flex: 1, backgroundColor: colors.screenBackground },
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 16 },
-  restScreen: { flex: 1, backgroundColor: '#f5f8f2' },
+  restScreen: { flex: 1, backgroundColor: colors.screenBackground },
   // Cover-fit crops the left and right edges to fill the top two thirds, edge to edge
   restImage: { width: '100%', height: '66%' },
   restBottom: {
@@ -400,11 +399,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     fontWeight: '700',
     marginBottom: 12,
   },
-  title: { fontSize: 30, fontWeight: '800', color: '#1d2a1d', marginBottom: 12, textAlign: 'center' },
+  title: { fontSize: 30, fontWeight: '800', color: colors.textPrimary, marginBottom: 12, textAlign: 'center' },
   stage: {
     position: 'absolute',
     top: 0,
@@ -417,15 +416,15 @@ const styles = StyleSheet.create({
   stageContent: { width: '100%', height: 200, alignItems: 'center', justifyContent: 'center' },
   buttonSlot: { width: '100%', height: 64, justifyContent: 'center' },
   belowSlot: { position: 'absolute', top: '100%', left: 0, right: 0 },
-  total: { fontSize: 30, fontWeight: '700', color: '#2d7a33', textAlign: 'center', marginBottom: 8 },
-  timer: { fontSize: 72, fontWeight: '800', color: '#2d7a33', marginBottom: 12 },
-  body: { fontSize: 16, lineHeight: 24, color: '#1d2a1d', marginBottom: 24, textAlign: 'center' },
+  total: { fontSize: 30, fontWeight: '700', color: colors.primary, textAlign: 'center', marginBottom: 8 },
+  timer: { fontSize: 72, fontWeight: '800', color: colors.primary, marginBottom: 12 },
+  body: { fontSize: 16, lineHeight: 24, color: colors.textPrimary, marginBottom: 24, textAlign: 'center' },
   input: {
     alignSelf: 'stretch',
     textAlign: 'center',
     borderWidth: 1,
-    borderColor: '#cce6cc',
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    backgroundColor: colors.white,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -433,15 +432,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   button: {
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
   },
   buttonDisabled: { opacity: 0.5 },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  buttonText: { color: colors.white, fontSize: 16, fontWeight: '700' },
   secondaryButton: { paddingVertical: 14, alignItems: 'center' },
-  secondaryButtonText: { color: '#2d7a33', fontSize: 16, fontWeight: '700' },
+  secondaryButtonText: { color: colors.primary, fontSize: 16, fontWeight: '700' },
   setRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -450,7 +449,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 16,
   },
-  setValue: { fontSize: 22, fontWeight: '500', color: '#9aae9a' },
-  setValueDone: { color: '#6b8f6b' },
-  setValueActive: { fontSize: 32, fontWeight: '800', color: '#2d7a33' },
+  setValue: { fontSize: 22, fontWeight: '500', color: colors.textSubtle },
+  setValueDone: { color: colors.textSoft },
+  setValueActive: { fontSize: 32, fontWeight: '800', color: colors.primary },
 });

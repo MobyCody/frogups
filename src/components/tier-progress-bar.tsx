@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { TIER_BADGES } from '@/components/tier-badge';
 import { getTierProgress, TRAINING_TIERS } from '@/utils/onboarding';
+import { colors } from '@/constants/colors';
 
 const BADGE_SIZE = 44;
 const TRACK_HEIGHT = 8;
@@ -65,12 +66,12 @@ const styles = StyleSheet.create({
     right: BADGE_SIZE / 2,
     height: TRACK_HEIGHT,
     borderRadius: TRACK_HEIGHT / 2,
-    backgroundColor: '#cfe3fb',
+    backgroundColor: colors.blueTrack,
     overflow: 'hidden',
   },
   fill: {
     height: '100%',
-    backgroundColor: '#1E3A8A',
+    backgroundColor: colors.navy,
     borderRadius: TRACK_HEIGHT / 2,
   },
   badgeRow: {
@@ -82,14 +83,14 @@ const styles = StyleSheet.create({
     width: BADGE_SIZE,
     height: BADGE_SIZE,
     borderRadius: BADGE_SIZE / 2,
-    backgroundColor: '#eaf2fd',
+    backgroundColor: colors.blueTint,
     alignItems: 'center',
     justifyContent: 'center',
   },
   badgeWrapperCurrent: {
     transform: [{ scale: 1.2 }],
     borderWidth: 2,
-    borderColor: '#1E3A8A',
+    borderColor: colors.navy,
   },
   badge: {
     width: BADGE_SIZE - 4,
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
   caption: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#1d2a1d',
+    color: colors.textPrimary,
     marginTop: 12,
   },
 });

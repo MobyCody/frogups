@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '@/constants/colors';
 
 export const LOGO_FONT = 'Silkscreen_700Bold';
 
@@ -20,14 +21,14 @@ const styles = StyleSheet.create({
     fontFamily: LOGO_FONT,
     fontSize: 28,
     letterSpacing: 2,
-    textShadowColor: '#0f3d14',
+    textShadowColor: colors.primaryDark,
     textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 0,
   },
   frog: {
-    color: '#2D7A33',
+    color: colors.primary,
   },
   ups: {
-    color: '#1E3A8A',
+    color: colors.navy,
   },
 });

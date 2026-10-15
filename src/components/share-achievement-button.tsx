@@ -1,9 +1,10 @@
 import { Image } from 'expo-image';
-import { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import { useRef, useState } from 'react';
-import { Pressable, type StyleProp, StyleSheet, Text, type TextStyle, View, type ViewStyle } from 'react-native';
+import { Linking, Pressable, type StyleProp, StyleSheet, Text, type TextStyle, View, type ViewStyle } from 'react-native';
+import { captureRef } from 'react-native-view-shot';
 
+import { colors } from '@/constants/colors';
 import type { AchievementDefinition } from '@/utils/achievements';
 import { shareAchievement } from '@/utils/share-achievement';
 
@@ -54,7 +55,11 @@ export function ShareAchievementButton({ achievement, unlockedAt, style, textSty
           <Text style={styles.date}>{new Date(unlockedAt ?? Date.now()).toLocaleDateString()}</Text>
           <View style={styles.footer}>
             <Text style={styles.catchphrase}>GET FROGGED WITH ME!</Text>
-            <Text style={styles.brand}>🐸🪷💦 Frogups</Text>
+            <Text 
+              style={styles.brand} 
+              onPress={() => Linking.openURL('https://play.google.com/store/apps/details?id=com.frogups.frogups')}>
+                Download Frogups 🐸🪷💦
+            </Text>
           </View>
         </View>
       </View>
@@ -70,31 +75,31 @@ const styles = StyleSheet.create({
   busy: { opacity: 0.6 },
   card: {
     width: 360,
-    backgroundColor: '#eaf7ea',
+    backgroundColor: colors.surfaceTint,
     padding: 28,
     alignItems: 'center',
     borderWidth: 6,
-    borderColor: '#2d7a33',
+    borderColor: colors.primary,
   },
   kicker: {
     fontSize: 13,
     letterSpacing: 2,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     fontWeight: '700',
   },
   badge: { width: 220, height: 220, marginTop: 16 },
-  title: { marginTop: 16, fontSize: 28, fontWeight: '800', color: '#1d2a1d', textAlign: 'center' },
-  description: { marginTop: 8, fontSize: 16, color: '#4d7c4d', textAlign: 'center' },
-  date: { marginTop: 8, fontSize: 13, color: '#6b8a6b' },
+  title: { marginTop: 16, fontSize: 28, fontWeight: '800', color: colors.textPrimary, textAlign: 'center' },
+  description: { marginTop: 8, fontSize: 16, color: colors.textMuted, textAlign: 'center' },
+  date: { marginTop: 8, fontSize: 13, color: colors.textSoft },
   footer: {
     marginTop: 24,
     alignSelf: 'stretch',
     alignItems: 'center',
     paddingTop: 16,
     borderTopWidth: 2,
-    borderTopColor: '#cce6cc',
+    borderTopColor: colors.border,
   },
-  catchphrase: { fontSize: 18, fontWeight: '800', color: '#2D7A33' },
-  brand: { marginTop: 4, fontSize: 15, fontWeight: '700', color: '#1E3A8A' },
+  catchphrase: { fontSize: 18, fontWeight: '800', color: colors.primary },
+  brand: { marginTop: 4, fontSize: 15, fontWeight: '700', color: colors.navy },
 });

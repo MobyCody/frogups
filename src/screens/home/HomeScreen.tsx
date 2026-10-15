@@ -15,6 +15,7 @@ import { useSharePrompt } from '@/hooks/use-share-prompt';
 import { useTraining } from '@/hooks/use-training';
 import { TRAINING_TIER_DETAILS } from '@/utils/onboarding';
 import { MOSS_PER_FREEZE } from '@/utils/workout';
+import { colors } from '@/constants/colors';
 
 const CATCHPHRASES = [
   'GET FROGGED!',
@@ -61,7 +62,7 @@ export default function HomeScreen() {
   if (status === 'loading' || status === 'idle') {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <ActivityIndicator accessibilityLabel="Loading your assessment" color="#2d7a33" />
+        <ActivityIndicator accessibilityLabel="Loading your assessment" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -89,7 +90,7 @@ export default function HomeScreen() {
             hitSlop={12}
             onPress={() => setSupportVisible(true)}
           >
-            <Ionicons name="cafe-sharp" size={26} color="#4d7c4d" />
+            <Ionicons name="cafe-sharp" size={26} color={colors.textMuted} />
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -97,7 +98,7 @@ export default function HomeScreen() {
             hitSlop={12}
             onPress={() => router.push('/achievements')}
           >
-            <Ionicons name="trophy-sharp" size={26} color="#4d7c4d" />
+            <Ionicons name="trophy-sharp" size={26} color={colors.textMuted} />
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -105,7 +106,7 @@ export default function HomeScreen() {
             hitSlop={12}
             onPress={() => router.push('/settings')}
           >
-            <Ionicons name="settings-sharp" size={26} color="#4d7c4d" />
+            <Ionicons name="settings-sharp" size={26} color={colors.textMuted} />
           </Pressable>
         </View>
 
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
   },
   subtle: {
     fontSize: 14,
-    color: '#4d7c4d',
+    color: colors.textMuted,
     marginTop: 2,
   },
   streakRow: {
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#e1eedf',
+    backgroundColor: colors.surfaceTint,
     marginVertical: 12,
   },
   mossRow: {
@@ -244,24 +245,24 @@ const styles = StyleSheet.create({
   mossInfo: { flex: 1 },
   mossCountRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   mossIcon: { height: 26, aspectRatio: 384 / 247 },
-  mossCount: { fontSize: 16, fontWeight: '800', color: '#1d2a1d' },
-  mossHint: { fontSize: 12, color: '#4d7c4d', marginTop: 4 },
+  mossCount: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
+  mossHint: { fontSize: 12, color: colors.textMuted, marginTop: 4 },
   moisturizeButton: {
-    backgroundColor: '#1E3A8A',
+    backgroundColor: colors.navy,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 14,
   },
   moisturizeButtonDisabled: { opacity: 0.35 },
-  moisturizeText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  moisturizeText: { color: colors.white, fontSize: 14, fontWeight: '700' },
   streak: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1d2a1d',
+    color: colors.textPrimary,
   },
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f8f2',
+    backgroundColor: colors.screenBackground,
   },
   container: {
     flex: 1,
@@ -279,17 +280,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     fontWeight: '700',
   },
   title: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#1d2a1d',
+    color: colors.textPrimary,
     marginBottom: 10,
   },
   startButton: {
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 16,
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -302,20 +303,20 @@ const styles = StyleSheet.create({
   startButtonText: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#fff',
+    color: colors.white,
     textAlign: 'center',
   },
   startButtonSubtext: {
     fontSize: 13,
-    color: '#d9f0d9',
+    color: colors.textOnPrimarySoft,
     marginTop: 4,
   },
   assessmentCard: {
-    backgroundColor: '#eaf7ea',
+    backgroundColor: colors.surfaceTint,
     borderRadius: 16,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#cce6cc',
+    borderColor: colors.border,
     marginBottom: 12,
   },
   tierRow: {
@@ -328,39 +329,39 @@ const styles = StyleSheet.create({
   bestRecord: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#2d7a33',
+    color: colors.primary,
     marginTop: 8,
   },
   progressCard: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     borderRadius: 16,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#cce6cc',
+    borderColor: colors.border,
     marginBottom: 12,
   },
   cardLabel: {
     fontSize: 12,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     letterSpacing: 1,
     marginBottom: 6,
   },
   tier: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1d2a1d',
+    color: colors.textPrimary,
   },
   range: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     marginTop: 4,
   },
   description: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#1d2a1d',
+    color: colors.textPrimary,
     marginTop: 8,
   },
 });

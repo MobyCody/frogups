@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { AchievementBadge } from '@/components/achievement-badge';
 import { ShareAchievementButton } from '@/components/share-achievement-button';
 import type { AchievementDefinition } from '@/utils/achievements';
+import { colors } from '@/constants/colors';
 
 export function AchievementUnlockModal({
   achievement,
@@ -38,40 +39,40 @@ export function AchievementUnlockModal({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
-  card: { width: '100%', backgroundColor: '#fff', borderRadius: 20, padding: 24, alignItems: 'center' },
+  card: { width: '100%', backgroundColor: colors.white, borderRadius: 20, padding: 24, alignItems: 'center' },
   kicker: {
     fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     fontWeight: '700',
     marginBottom: 16,
   },
-  title: { marginTop: 16, fontSize: 24, fontWeight: '800', color: '#1d2a1d', textAlign: 'center' },
-  body: { marginTop: 8, fontSize: 16, color: '#4d7c4d', textAlign: 'center' },
+  title: { marginTop: 16, fontSize: 24, fontWeight: '800', color: colors.textPrimary, textAlign: 'center' },
+  body: { marginTop: 8, fontSize: 16, color: colors.textMuted, textAlign: 'center' },
   shareButton: {
     marginTop: 20,
     alignSelf: 'stretch',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     borderRadius: 14,
     borderWidth: 2,
-    borderColor: '#2d7a33',
+    borderColor: colors.primary,
     paddingVertical: 12,
   },
-  shareText: { color: '#2d7a33', fontSize: 16, fontWeight: '800' },
+  shareText: { color: colors.primary, fontSize: 16, fontWeight: '800' },
   okButton: {
     marginTop: 10,
     alignSelf: 'stretch',
     alignItems: 'center',
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 14,
   },
-  okText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  okText: { color: colors.white, fontSize: 16, fontWeight: '800' },
 });

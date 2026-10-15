@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { TierBadge } from '@/components/tier-badge';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { TRAINING_TIER_DETAILS } from '@/utils/onboarding';
+import { colors } from '@/constants/colors';
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -95,7 +96,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f8f2',
+    backgroundColor: colors.screenBackground,
   },
   container: {
     flexGrow: 1,
@@ -107,66 +108,66 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     fontWeight: '700',
     marginBottom: 12,
   },
   title: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#1d2a1d',
+    color: colors.textPrimary,
     marginBottom: 24,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#bfd7bf',
+    borderColor: colors.border,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     fontSize: 20,
-    color: '#1d2a1d',
+    color: colors.textPrimary,
     marginBottom: 16,
   },
   error: {
-    color: '#b42318',
+    color: colors.danger,
     fontSize: 14,
     marginBottom: 12,
     fontWeight: '600',
   },
   tierCard: {
-    backgroundColor: '#eaf7ea',
+    backgroundColor: colors.surfaceTint,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#cce6cc',
+    borderColor: colors.border,
   },
   tierLabel: {
     fontSize: 12,
     textTransform: 'uppercase',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     letterSpacing: 1,
     marginBottom: 6,
   },
   tier: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1d2a1d',
+    color: colors.textPrimary,
   },
   tierRange: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#4d7c4d',
+    color: colors.textMuted,
     marginTop: 4,
   },
   tierDescription: {
     fontSize: 14,
-    color: '#1d2a1d',
+    color: colors.textPrimary,
     marginTop: 8,
   },
   button: {
-    backgroundColor: '#2d7a33',
+    backgroundColor: colors.primary,
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 18,
     fontWeight: '700',
   },
