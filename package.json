@@ -45,15 +45,15 @@
     "gh-pages": "^6.1.1",
     "typescript": "~6.0.3"
   },
-  "scripts": {
+"scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "predeploy": "npx expo export",
-    "deploy": "gh-pages -d dist"
+    "predeploy": "npx expo export --platform web -c",
+    "deploy": "node -e \"require('fs').writeFileSync('dist/.nojekyll', '')\" && cd dist && git init && git checkout -b gh-pages && git add . --force && git commit -m \"Web Build\" && git push -f https://github.com/MobyCody/frogups.git gh-pages && cd .."
   },
   "private": true
 }
